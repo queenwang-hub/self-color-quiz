@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发现你的自我底色｜趣味小测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        milk: '#f8f6f4',
+                        orange: '#f97316',
+                        blue: '#1e3a5f',
+                        green: '#365943'
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .option:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div class="max-w-xl mx-auto px-5 py-10">
+        <!-- 首页 -->
+        <div id="page-start" class="fade-in">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-4">发现你的自我底色</h2>
+                <p class="text-slate-600 leading-relaxed mb-6 text-center">
+                    每个人都有与生俱来的自我底色，藏在你的选择与情绪里。<br>凭第一直觉作答，解锁你最本真的人格内核。
+                </p>
+                <div class="text-center">
+                    <button onclick="startTest()" class="bg-indigo-500 text-white px-8 py-3 rounded-full text-lg hover:bg-indigo-600 transition-all">
+                        开始测试
+                    </button>
+                </div>
+            </div>
+            <p class="text-slate-400 text-sm text-center mt-4">一共6道题 · 1分钟完成</p>
+        </div>
+
+        <!-- 题目区域 -->
+        <div id="page-questions" class="hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-slate-500">题目 <span id="q-index">1</span>/6</span>
+                    <div class="h-2 w-24 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="h-full bg-indigo-500 w-[16%]"></div>
+                    </div>
+                </div>
+                <h3 id="question-title" class="text-lg font-semibold text-slate-800 mb-6"></h3>
+                <div id="option-wrap" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div id="page-result" class="hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">你的自我底色是</h2>
+                <div id="color-block" class="w-24 h-24 rounded-full mx-auto my-5"></div>
+                <h3 id="result-name" class="text-xl font-bold text-center mb-3"></h3>
+                <p id="result-desc" class="text-slate-600 leading-relaxed mb-6"></p>
+                <div class="space-y-3">
+                    <button onclick="restartTest()" class="w-full py-3 border border-indigo-500 text-indigo-500 rounded-full hover:bg-indigo-50 transition-all">
+                        重新测试
+                    </button>
+                    <button onclick="shareResult()" class="w-full py-3 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all">
+                        <i class="fa fa-share-alt mr-2"></i>分享给朋友
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                title: "周末独处一整天，你更愿意怎么度过？",
+                options: [
+                    {text:"A、宅家追剧、看书，彻底放空", score:3},
+                    {text:"B、出门探店散步，收集生活小美好", score:1},
+                    {text:"C、整理房间，规划下周事情", score:4},
+                    {text:"D、约好友小聚聊天，享受陪伴", score:2},
+                ]
+            },
+            {
+                title: "遇到突发麻烦事，你的第一反应是？",
+                options: [
+                    {text:"A、冷静沉默，独自复盘悄悄解决", score:3},
+                    {text:"B、有点慌乱，慢慢顺其自然化解", score:1},
+                    {text:"C、立刻梳理，优先寻找解决方案", score:4},
+                    {text:"D、找人倾诉，借助陪伴缓解情绪", score:2},
+                ]
+            },
+            {
+                title: "别人对你的日常评价，大多是？",
+                options: [
+                    {text:"A、通透清醒，内心独立有主见", score:3},
+                    {text:"B、温柔细腻，共情力很强", score:1},
+                    {text:"C、靠谱果断，逻辑清晰踏实", score:4},
+                    {text:"D、开朗有趣，自带感染力", score:2},
+                ]
+            },
+            {
+                title: "选择一种你最偏爱的生活氛围？",
+                options: [
+                    {text:"A、安静静谧，不被打扰，随心自在", score:3},
+                    {text:"B、温暖治愈，平和安稳", score:1},
+                    {text:"C、清醒自律，掌控自己的节奏", score:4},
+                    {text:"D、热烈自由，新鲜随性", score:2},
+                ]
+            },
+            {
+                title: "感到内耗焦虑时，你会？",
+                options: [
+                    {text:"A、独处自愈，自己消化情绪", score:3},
+                    {text:"B、慢下来，接纳情绪与自己和解", score:1},
+                    {text:"C、立刻行动，做事转移注意力", score:4},
+                    {text:"D、出门散心，找人陪伴治愈", score:2},
+                ]
+            },
+            {
+                title: "面对未来，你最看重什么？",
+                options: [
+                    {text:"A、内心自由，精神丰盈忠于自我", score:3},
+                    {text:"B、平安顺遂，温暖舒心", score:1},
+                    {text:"C、稳步成长，沉淀实力掌控人生", score:4},
+                    {text:"D、丰富体验，不留遗憾", score:2},
+                ]
+            }
+        ];
+
+        const resultData = [
+            { min:6, max:9, name:"温柔奶白底色", color:"#f8f6f4", desc:"你的自我底色是干净通透的奶白色，没有攻击性，自带温柔滤镜。骨子里善良细腻，共情力强，习惯善待身边的人。你不爱争抢内卷，偏爱细水长流的安稳。看似柔软，内心坚韧，是身边人的情绪港湾。"},
+            { min:10, max:13, name:"鲜活暖橙底色", color:"#f97316", desc:"你的底色是元气满满的暖橙色，鲜活热烈，充满烟火气。天生乐观，擅长捕捉生活里的小美好，低谷也能快速自愈。待人真诚坦荡，不爱弯弯绕绕，向往自由松弛的生活，你的存在就是一束温暖的光。"},
+            { min:14, max:17, name:"清醒墨蓝底色", color:"#1e3a5f", desc:"专属你的底色是沉稳高级的墨蓝色，代表清醒独立、有主见。你习惯独处自省，不随波逐流，看人看事通透理性，很少被情绪裹挟。外表清冷疏离，内心柔软，习惯依靠自己，内核稳定，永远忠于自我。"},
+            { min:18, max:21, name:"笃定青苍底色", color:"#365943", desc:"你的底色是沉稳生长的青苍色，坚韧、笃定、充满力量。天生理性靠谱，执行力强，对自己有规划有要求。遇事冷静优先解决问题，不内耗不矫情。低调却藏着向上的力量，靠自己一步步掌控人生，是成长型强者。"}
+        ];
+
+        let currentQuestion = 0;
+        let totalScore = 0;
+
+        function startTest(){
+            document.getElementById('page-start').classList.add('hidden');
+            document.getElementById('page-questions').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion(){
+            const q = questions[currentQuestion];
+            document.getElementById('q-index').innerText = currentQuestion+1;
+            document.getElementById('question-title').innerText = q.title;
+            document.getElementById('option-wrap').innerHTML = '';
+            const progress = ((currentQuestion+1)/6)*100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            q.options.forEach(opt=>{
+                const div = document.createElement('div');
+                div.className = "option p-4 border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer transition-all";
+                div.innerText = opt.text;
+                div.onclick = ()=>{
+                    totalScore += opt.score;
+                    currentQuestion++;
+                    if(currentQuestion >= questions.length){
+                        showResult();
+                    }else{
+                        showQuestion();
+                    }
+                }
+                document.getElementById('option-wrap').appendChild(div);
+            })
+        }
+
+        function showResult(){
+            document.getElementById('page-questions').classList.add('hidden');
+            document.getElementById('page-result').classList.remove('hidden');
+            let res = resultData.find(r=> totalScore >= r.min && totalScore <= r.max);
+            document.getElementById('color-block').style.backgroundColor = res.color;
+            document.getElementById('result-name').innerText = res.name;
+            document.getElementById('result-desc').innerText = res.desc;
+        }
+
+        function restartTest(){
+            currentQuestion = 0;
+            totalScore = 0;
+            document.getElementById('page-result').classList.add('hidden');
+            document.getElementById('page-start').classList.remove('hidden');
+        }
+
+        function shareResult(){
+            const text = `我测出的自我底色是【${document.getElementById('result-name').innerText}】！快来测试看看你的底色是什么✨`;
+            if(navigator.share){
+                navigator.share({title:"发现你的自我底色",text:text})
+            }else{
+                navigator.clipboard.writeText(text).then(()=>alert("结果文案已复制，可以去分享啦！"))
+            }
+        }
+    </script>
+</body>
+</html>
